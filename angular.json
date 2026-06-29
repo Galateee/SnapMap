@@ -27,6 +27,7 @@
               "src/polyfills.ts"
             ],
             "tsConfig": "tsconfig.app.json",
+            "allowedCommonJsDependencies": ["mapbox-gl"],
             "inlineStyleLanguage": "scss",
             "assets": [
               {
