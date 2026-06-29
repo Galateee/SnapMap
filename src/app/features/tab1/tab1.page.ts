@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -34,11 +34,15 @@ import { PhotoService } from '../../core/services/photo.service';
     IonImg,
   ],
 })
-export class Tab1Page {
+export class Tab1Page implements OnInit {
   public photoService = inject(PhotoService);
 
   constructor() {
     addIcons({ camera });
+  }
+
+  async ngOnInit() {
+    await this.photoService.loadSaved();
   }
 
   takePhoto() {

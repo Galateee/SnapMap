@@ -11,9 +11,15 @@
     </ion-toolbar>
   </ion-header>
 
-  @if (photoService.webPath) {
-  <img [src]="photoService.webPath" />
-  }
+  <ion-grid>
+    <ion-row>
+      @for (photo of photoService.photos; track photo.webviewPath) {
+        <ion-col size="6">
+          <ion-img [src]="photo.webviewPath"></ion-img>
+        </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="center" slot="fixed">
     <ion-fab-button (click)="takePhoto()">
