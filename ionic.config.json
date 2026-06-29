@@ -1,0 +1,7 @@
+{
+  "name": "SnapMap",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
