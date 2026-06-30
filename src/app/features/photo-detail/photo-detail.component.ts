@@ -1,9 +1,12 @@
 import {
+  AfterViewInit,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  ElementRef,
   inject,
   Input,
   OnInit,
+  ViewChild,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
@@ -37,9 +40,16 @@ import { GeocodingService } from '../../core/services/geocoding.service';
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PhotoDetailComponent implements OnInit {
+export class PhotoDetailComponent implements OnInit, AfterViewInit {
   @Input() photos: UserPhoto[] = [];
   @Input() initialSlide = 0;
+
+  @ViewChild('swiper') private swiperRef?: ElementRef<
+    HTMLElement & {
+      swiper?: { slideTo: (index: number, speed: number) => void };
+      initialize?: () => void;
+    }
+  >;
 
   private modalController = inject(ModalController);
   private geocodingService = inject(GeocodingService);
@@ -52,6 +62,22 @@ export class PhotoDetailComponent implements OnInit {
 
   ngOnInit() {
     this.resolveLocation(this.photos[this.initialSlide]);
+  }
+
+  ngAfterViewInit() {
+    const element = this.swiperRef?.nativeElement;
+    if (!element) {
+      return;
+    }
+    if (element.swiper) {
+      element.swiper.slideTo(this.initialSlide, 0);
+      return;
+    }
+    element.addEventListener(
+      'swiperinit',
+      () => element.swiper?.slideTo(this.initialSlide, 0),
+      { once: true },
+    );
   }
 
   protected getDate(photo: UserPhoto): number {

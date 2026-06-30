@@ -11,6 +11,7 @@
 
 <ion-content [fullscreen]="true" class="ion-no-padding">
   <swiper-container
+    #swiper
     class="photo-swiper"
     [attr.initial-slide]="initialSlide"
     (swiperslidechange)="onSlideChange($event)"

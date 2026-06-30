@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ photos.length }} photos ici</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row>
+      @for (photo of photos; track photo.filepath; let i = $index) {
+        <ion-col size="4">
+          <ion-img
+            [src]="photo.webviewPath"
+            class="cluster-thumb"
+            (click)="openPhoto(i)"
+          ></ion-img>
+        </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
+</ion-content>
