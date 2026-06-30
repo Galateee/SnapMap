@@ -9,10 +9,11 @@ import {
   IonCol,
   IonIcon,
   IonButton,
-  ToastController,
+  IonSkeletonText,
 } from '@ionic/angular/standalone';
 import { PhotoService } from '../../core/services/photo.service';
 import { PaymentService } from '../../core/services/payment.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { addIcons } from 'ionicons';
 import { lockClosed, lockOpen } from 'ionicons/icons';
 
@@ -30,46 +31,57 @@ import { lockClosed, lockOpen } from 'ionicons/icons';
     IonCol,
     IonIcon,
     IonButton,
+    IonSkeletonText,
   ],
 })
 export class Tab3Page implements OnInit {
   photoService = inject(PhotoService);
-  paymentService = inject(PaymentService);
-  private toastController = inject(ToastController);
+  private paymentService = inject(PaymentService);
+  private notification = inject(NotificationService);
+
+  protected isLoading = false;
+  protected readonly skeletonItems = [0, 1, 2, 3];
 
   constructor() {
     addIcons({ lockClosed, lockOpen });
   }
 
   async ngOnInit() {
-    await this.photoService.loadSaved();
+    this.isLoading = true;
+    try {
+      await this.photoService.loadSaved();
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   async buyPhoto(filepath: string) {
-    const success = await this.paymentService.buyPhoto();
-    if (success) {
-      await this.photoService.markAsPurchased(filepath);
-    }
+    const success = await this.notification.withLoading(
+      'Paiement en cours…',
+      () => this.paymentService.buyPhoto(),
+    );
+    await this.handlePaymentResult(filepath, success);
   }
 
   async buyPhotoWithGooglePay(filepath: string) {
     const available = await this.paymentService.isGooglePayAvailable();
     if (!available) {
-      await this.showToast('Google Pay indisponible sur cet appareil');
+      await this.notification.info('Google Pay indisponible sur cet appareil');
       return;
     }
-    const success = await this.paymentService.buyPhotoWithGooglePay();
-    if (success) {
-      await this.photoService.markAsPurchased(filepath);
-    }
+    const success = await this.notification.withLoading(
+      'Paiement Google Pay…',
+      () => this.paymentService.buyPhotoWithGooglePay(),
+    );
+    await this.handlePaymentResult(filepath, success);
   }
 
-  private async showToast(message: string) {
-    const toast = await this.toastController.create({
-      message,
-      duration: 2500,
-      position: 'bottom',
-    });
-    await toast.present();
+  private async handlePaymentResult(filepath: string, success: boolean) {
+    if (success) {
+      await this.photoService.markAsPurchased(filepath);
+      await this.notification.success('Achat réussi 🎉');
+    } else {
+      await this.notification.error('Paiement annulé ou échoué');
+    }
   }
 }

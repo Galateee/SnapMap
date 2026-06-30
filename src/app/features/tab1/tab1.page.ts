@@ -12,13 +12,15 @@ import {
   IonCol,
   IonImg,
   IonButton,
-  AlertController,
+  IonSkeletonText,
+  IonSpinner,
   ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { camera, heart, heartOutline, trash } from 'ionicons/icons';
-import { PhotoService } from '../../core/services/photo.service';
+import { PhotoService, UserPhoto } from '../../core/services/photo.service';
 import { PhotoDetailComponent } from '../photo-detail/photo-detail.component';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-tab1',
@@ -37,23 +39,43 @@ import { PhotoDetailComponent } from '../photo-detail/photo-detail.component';
     IonCol,
     IonImg,
     IonButton,
+    IonSkeletonText,
+    IonSpinner,
   ],
 })
 export class Tab1Page implements OnInit {
   public photoService = inject(PhotoService);
-  private alertController = inject(AlertController);
   private modalController = inject(ModalController);
+  private notification = inject(NotificationService);
+
+  protected isLoading = false;
+  protected isAddingPhoto = false;
+  protected readonly skeletonItems = [0, 1, 2, 3];
 
   constructor() {
     addIcons({ camera, heart, heartOutline, trash });
   }
 
   async ngOnInit() {
-    await this.photoService.loadSaved();
+    this.isLoading = true;
+    try {
+      await this.photoService.loadSaved();
+    } finally {
+      this.isLoading = false;
+    }
   }
 
-  takePhoto() {
-    this.photoService.takePhoto();
+  async takePhoto() {
+    try {
+      await this.photoService.takePhoto(() => (this.isAddingPhoto = true));
+      await this.notification.success('Photo ajoutée');
+    } catch (error) {
+      if (!this.isCancellation(error)) {
+        await this.notification.error("Impossible d'ajouter la photo");
+      }
+    } finally {
+      this.isAddingPhoto = false;
+    }
   }
 
   async openPhoto(index: number) {
@@ -67,25 +89,29 @@ export class Tab1Page implements OnInit {
     await modal.present();
   }
 
-  toggleLike(filepath: string) {
-    this.photoService.toggleLike(filepath);
+  async toggleLike(photo: UserPhoto) {
+    await this.photoService.toggleLike(photo.filepath);
+    await this.notification.success(
+      photo.liked ? 'Ajouté aux favoris' : 'Retiré des favoris',
+    );
   }
 
   async confirmDelete(filepath: string) {
-    const alert = await this.alertController.create({
+    const confirmed = await this.notification.confirm({
       header: 'Supprimer la photo',
       message: 'Cette action est définitive. Confirmer la suppression ?',
-      buttons: [
-        { text: 'Annuler', role: 'cancel' },
-        {
-          text: 'Supprimer',
-          role: 'destructive',
-          handler: () => {
-            this.photoService.deletePhoto(filepath);
-          },
-        },
-      ],
+      confirmText: 'Supprimer',
+      destructive: true,
     });
-    await alert.present();
+    if (!confirmed) {
+      return;
+    }
+    await this.photoService.deletePhoto(filepath);
+    await this.notification.success('Photo supprimée');
+  }
+
+  private isCancellation(error: unknown): boolean {
+    const message = error instanceof Error ? error.message : String(error);
+    return message.toLowerCase().includes('cancel');
   }
 }

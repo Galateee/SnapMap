@@ -7,24 +7,36 @@
 <ion-content>
   <ion-grid>
     <ion-row>
-      @for (photo of photoService.photos; track photo.filepath) {
-        <ion-col size="6">
-          <div class="photo-card" [class.locked]="!photo.purchased">
-            <img [src]="photo.webviewPath" />
-            @if (!photo.purchased) {
-              <div class="overlay">
-                <ion-icon name="lock-closed"></ion-icon>
-                <ion-button (click)="buyPhoto(photo.filepath)">Acheter 5 € (CB)</ion-button>
-                <ion-button (click)="buyPhotoWithGooglePay(photo.filepath)" color="dark">
-                  Google Pay
-                </ion-button>
-              </div>
-            } @else {
-              <ion-icon name="lock-open" class="unlocked-badge"></ion-icon>
-            }
+      @if (isLoading) { @for (item of skeletonItems; track item) {
+      <ion-col size="6">
+        <ion-skeleton-text
+          [animated]="true"
+          class="card-skeleton"
+        ></ion-skeleton-text>
+      </ion-col>
+      } } @else { @for (photo of photoService.photos; track photo.filepath) {
+      <ion-col size="6">
+        <div class="photo-card" [class.locked]="!photo.purchased">
+          <img [src]="photo.webviewPath" />
+          @if (!photo.purchased) {
+          <div class="overlay">
+            <ion-icon name="lock-closed"></ion-icon>
+            <ion-button (click)="buyPhoto(photo.filepath)"
+              >Acheter 5 € (CB)</ion-button
+            >
+            <ion-button
+              (click)="buyPhotoWithGooglePay(photo.filepath)"
+              color="dark"
+            >
+              Google Pay
+            </ion-button>
           </div>
-        </ion-col>
-      }
+          } @else {
+          <ion-icon name="lock-open" class="unlocked-badge"></ion-icon>
+          }
+        </div>
+      </ion-col>
+      } }
     </ion-row>
   </ion-grid>
 </ion-content>

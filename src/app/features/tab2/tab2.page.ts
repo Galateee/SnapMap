@@ -13,6 +13,7 @@ import { MapService } from '../../core/services/map.service';
 import { PhotoService, UserPhoto } from '../../core/services/photo.service';
 import { PhotoDetailComponent } from '../photo-detail/photo-detail.component';
 import { ClusterListComponent } from '../cluster-list/cluster-list.component';
+import { NotificationService } from '../../core/services/notification.service';
 
 const DEFAULT_CENTER = { lat: 48.8566, lng: 2.3522 };
 
@@ -27,14 +28,21 @@ export class Tab2Page implements AfterViewInit, ViewWillEnter {
   private mapService = inject(MapService);
   private photoService = inject(PhotoService);
   private modalController = inject(ModalController);
+  private notification = inject(NotificationService);
   protected mapLoaded = false;
+  protected mapError = false;
 
   async ngAfterViewInit() {
-    const position =
-      (await this.geolocationService.getCurrentPosition()) ?? DEFAULT_CENTER;
-    await this.mapService.initMap('map', position.lat, position.lng);
-    this.mapLoaded = true;
-    await this.refresh();
+    try {
+      const position =
+        (await this.geolocationService.getCurrentPosition()) ?? DEFAULT_CENTER;
+      await this.mapService.initMap('map', position.lat, position.lng);
+      this.mapLoaded = true;
+      await this.refresh();
+    } catch {
+      this.mapError = true;
+      await this.notification.error('Impossible de charger la carte');
+    }
   }
 
   async ionViewWillEnter() {

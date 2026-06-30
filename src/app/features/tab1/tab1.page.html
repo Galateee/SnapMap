@@ -13,8 +13,22 @@
 
   <ion-grid>
     <ion-row>
-      @for (photo of photoService.photos; track photo.filepath; let i = $index)
-      {
+      @if (isLoading) { @for (item of skeletonItems; track item) {
+      <ion-col size="6">
+        <ion-skeleton-text
+          [animated]="true"
+          class="gallery-skeleton"
+        ></ion-skeleton-text>
+      </ion-col>
+      } } @else { @if (isAddingPhoto) {
+      <ion-col size="6">
+        <div class="pending-card">
+          <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+          <ion-spinner name="crescent"></ion-spinner>
+        </div>
+      </ion-col>
+      } @for (photo of photoService.photos; track photo.filepath; let i =
+      $index) {
       <ion-col size="6">
         <div class="photo-item">
           <ion-img
@@ -23,29 +37,24 @@
             (click)="openPhoto(i)"
           ></ion-img>
           <div class="photo-actions">
-            <ion-button
-              fill="clear"
-              size="small"
-              (click)="toggleLike(photo.filepath)"
-            >
+            <ion-button fill="clear" size="small" (click)="toggleLike(photo)">
               <ion-icon
                 slot="icon-only"
                 [name]="photo.liked ? 'heart' : 'heart-outline'"
-                [color]="photo.liked ? 'danger' : 'medium'"
+                [color]="photo.liked ? 'danger' : 'light'"
               ></ion-icon>
             </ion-button>
             <ion-button
               fill="clear"
               size="small"
-              color="danger"
               (click)="confirmDelete(photo.filepath)"
             >
-              <ion-icon slot="icon-only" name="trash"></ion-icon>
+              <ion-icon slot="icon-only" name="trash" color="light"></ion-icon>
             </ion-button>
           </div>
         </div>
       </ion-col>
-      }
+      } }
     </ion-row>
   </ion-grid>
 
