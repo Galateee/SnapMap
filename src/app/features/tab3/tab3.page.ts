@@ -10,12 +10,14 @@ import {
   IonIcon,
   IonButton,
   IonSkeletonText,
+  ModalController,
 } from '@ionic/angular/standalone';
-import { PhotoService } from '../../core/services/photo.service';
+import { PhotoService, UserPhoto } from '../../core/services/photo.service';
 import { PaymentService } from '../../core/services/payment.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { PhotoDetailComponent } from '../photo-detail/photo-detail.component';
 import { addIcons } from 'ionicons';
-import { lockClosed, lockOpen } from 'ionicons/icons';
+import { lockClosed, lockOpen, expand } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tab3',
@@ -38,12 +40,29 @@ export class Tab3Page implements OnInit {
   photoService = inject(PhotoService);
   private paymentService = inject(PaymentService);
   private notification = inject(NotificationService);
+  private modalController = inject(ModalController);
 
   protected isLoading = false;
   protected readonly skeletonItems = [0, 1, 2, 3];
 
   constructor() {
-    addIcons({ lockClosed, lockOpen });
+    addIcons({ lockClosed, lockOpen, expand });
+  }
+
+  async openPhoto(photo: UserPhoto) {
+    if (!photo.purchased) {
+      return;
+    }
+    const purchased = this.photoService.photos.filter((p) => p.purchased);
+    const index = purchased.findIndex((p) => p.filepath === photo.filepath);
+    const modal = await this.modalController.create({
+      component: PhotoDetailComponent,
+      componentProps: {
+        photos: purchased,
+        initialSlide: Math.max(index, 0),
+      },
+    });
+    await modal.present();
   }
 
   async ngOnInit() {
@@ -56,10 +75,7 @@ export class Tab3Page implements OnInit {
   }
 
   async buyPhoto(filepath: string) {
-    const success = await this.notification.withLoading(
-      'Paiement en cours…',
-      () => this.paymentService.buyPhoto(),
-    );
+    const success = await this.paymentService.buyPhoto();
     await this.handlePaymentResult(filepath, success);
   }
 
@@ -69,10 +85,7 @@ export class Tab3Page implements OnInit {
       await this.notification.info('Google Pay indisponible sur cet appareil');
       return;
     }
-    const success = await this.notification.withLoading(
-      'Paiement Google Pay…',
-      () => this.paymentService.buyPhotoWithGooglePay(),
-    );
+    const success = await this.paymentService.buyPhotoWithGooglePay();
     await this.handlePaymentResult(filepath, success);
   }
 

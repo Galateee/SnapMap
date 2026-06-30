@@ -16,7 +16,12 @@
       </ion-col>
       } } @else { @for (photo of photoService.photos; track photo.filepath) {
       <ion-col size="6">
-        <div class="photo-card" [class.locked]="!photo.purchased">
+        <div
+          class="photo-card"
+          [class.locked]="!photo.purchased"
+          [class.clickable]="photo.purchased"
+          (click)="openPhoto(photo)"
+        >
           <img [src]="photo.webviewPath" />
           @if (!photo.purchased) {
           <div class="overlay">
@@ -32,7 +37,11 @@
             </ion-button>
           </div>
           } @else {
-          <ion-icon name="lock-open" class="unlocked-badge"></ion-icon>
+          <ion-icon
+            name="expand"
+            class="unlocked-badge"
+            aria-label="Voir en plein écran"
+          ></ion-icon>
           }
         </div>
       </ion-col>

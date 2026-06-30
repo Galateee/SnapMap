@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import {
   AlertController,
-  LoadingController,
   ToastController,
 } from '@ionic/angular/standalone';
 
@@ -21,7 +20,6 @@ interface ConfirmOptions {
 export class NotificationService {
   private toastController = inject(ToastController);
   private alertController = inject(AlertController);
-  private loadingController = inject(LoadingController);
 
   async success(message: string): Promise<void> {
     await this.toast(message, 'success', SUCCESS_DURATION);
@@ -50,19 +48,6 @@ export class NotificationService {
     await alert.present();
     const { role } = await alert.onDidDismiss();
     return role === 'confirm' || role === 'destructive';
-  }
-
-  async withLoading<T>(message: string, task: () => Promise<T>): Promise<T> {
-    const loading = await this.loadingController.create({
-      message,
-      spinner: 'crescent',
-    });
-    await loading.present();
-    try {
-      return await task();
-    } finally {
-      await loading.dismiss();
-    }
   }
 
   private async toast(

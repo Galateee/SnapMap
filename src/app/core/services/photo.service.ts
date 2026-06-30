@@ -23,12 +23,13 @@ export class PhotoService {
   public photos: UserPhoto[] = [];
   private PHOTO_STORAGE = 'photos';
 
-  public async takePhoto(onCaptured?: () => void) {
+  public async takePhoto(onCaptured?: () => void, onSaved?: () => void) {
     const result = await Camera.takePhoto({ quality: 100 });
     onCaptured?.();
     const position = await this.geolocationService.getCurrentPosition();
     const savedPhoto = await this.savePhoto(result, position);
     this.photos.unshift(savedPhoto);
+    onSaved?.();
     await Preferences.set({
       key: this.PHOTO_STORAGE,
       value: JSON.stringify(this.photos),

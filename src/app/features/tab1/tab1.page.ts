@@ -67,7 +67,10 @@ export class Tab1Page implements OnInit {
 
   async takePhoto() {
     try {
-      await this.photoService.takePhoto(() => (this.isAddingPhoto = true));
+      await this.photoService.takePhoto(
+        () => (this.isAddingPhoto = true),
+        () => (this.isAddingPhoto = false),
+      );
       await this.notification.success('Photo ajoutée');
     } catch (error) {
       const kind = this.classifyCameraError(error);

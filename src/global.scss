@@ -38,6 +38,12 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
 
+stripe-card-element-modal,
+stripe-payment-request-button {
+  position: relative;
+  z-index: 100000;
+}
+
 .snap-marker {
   position: relative;
   width: 54px;

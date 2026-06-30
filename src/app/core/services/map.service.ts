@@ -53,6 +53,10 @@ export class MapService {
     });
   }
 
+  resize(): void {
+    this.map?.resize();
+  }
+
   showPhotos(
     photos: UserPhoto[],
     onSelect: SelectHandler,

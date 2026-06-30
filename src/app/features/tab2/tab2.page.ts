@@ -7,6 +7,7 @@ import {
   IonSpinner,
   ModalController,
   ViewWillEnter,
+  ViewDidEnter,
 } from '@ionic/angular/standalone';
 import { GeolocationService } from '../../core/services/geolocation.service';
 import { MapService } from '../../core/services/map.service';
@@ -23,7 +24,7 @@ const DEFAULT_CENTER = { lat: 48.8566, lng: 2.3522 };
   styleUrls: ['tab2.page.scss'],
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonSpinner],
 })
-export class Tab2Page implements AfterViewInit, ViewWillEnter {
+export class Tab2Page implements AfterViewInit, ViewWillEnter, ViewDidEnter {
   private geolocationService = inject(GeolocationService);
   private mapService = inject(MapService);
   private photoService = inject(PhotoService);
@@ -53,6 +54,12 @@ export class Tab2Page implements AfterViewInit, ViewWillEnter {
   async ionViewWillEnter() {
     if (this.mapLoaded) {
       await this.refresh();
+    }
+  }
+
+  ionViewDidEnter() {
+    if (this.mapLoaded) {
+      this.mapService.resize();
     }
   }
 

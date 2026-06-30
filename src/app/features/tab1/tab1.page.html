@@ -1,13 +1,13 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title> Tab 1 </ion-title>
+    <ion-title> Galerie </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
+      <ion-title size="large">Galerie</ion-title>
     </ion-toolbar>
   </ion-header>
 
@@ -37,19 +37,27 @@
             (click)="openPhoto(i)"
           ></ion-img>
           <div class="photo-actions">
-            <ion-button fill="clear" size="small" (click)="toggleLike(photo)">
+            <ion-button
+              fill="clear"
+              size="small"
+              [attr.aria-label]="
+                photo.liked ? 'Retirer des favoris' : 'Ajouter aux favoris'
+              "
+              (click)="toggleLike(photo)"
+            >
               <ion-icon
                 slot="icon-only"
                 [name]="photo.liked ? 'heart' : 'heart-outline'"
-                [color]="photo.liked ? 'danger' : 'light'"
+                color="primary"
               ></ion-icon>
             </ion-button>
             <ion-button
               fill="clear"
               size="small"
+              aria-label="Supprimer la photo"
               (click)="confirmDelete(photo.filepath)"
             >
-              <ion-icon slot="icon-only" name="trash" color="light"></ion-icon>
+              <ion-icon slot="icon-only" name="trash" color="primary"></ion-icon>
             </ion-button>
           </div>
         </div>
@@ -59,7 +67,7 @@
   </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-fab-button (click)="takePhoto()">
+    <ion-fab-button aria-label="Prendre une photo" (click)="takePhoto()">
       <ion-icon name="camera"></ion-icon>
     </ion-fab-button>
   </ion-fab>
