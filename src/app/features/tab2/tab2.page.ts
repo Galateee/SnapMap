@@ -34,9 +34,14 @@ export class Tab2Page implements AfterViewInit, ViewWillEnter {
 
   async ngAfterViewInit() {
     try {
-      const position =
-        (await this.geolocationService.getCurrentPosition()) ?? DEFAULT_CENTER;
-      await this.mapService.initMap('map', position.lat, position.lng);
+      const position = await this.geolocationService.getCurrentPosition();
+      if (!position) {
+        await this.notification.info(
+          'Localisation indisponible : position par défaut utilisée',
+        );
+      }
+      const center = position ?? DEFAULT_CENTER;
+      await this.mapService.initMap('map', center.lat, center.lng);
       this.mapLoaded = true;
       await this.refresh();
     } catch {

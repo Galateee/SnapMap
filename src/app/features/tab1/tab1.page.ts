@@ -70,7 +70,12 @@ export class Tab1Page implements OnInit {
       await this.photoService.takePhoto(() => (this.isAddingPhoto = true));
       await this.notification.success('Photo ajoutée');
     } catch (error) {
-      if (!this.isCancellation(error)) {
+      const kind = this.classifyCameraError(error);
+      if (kind === 'denied') {
+        await this.notification.error(
+          'Accès à la caméra refusé. Autorisez-le dans les réglages.',
+        );
+      } else if (kind === 'error') {
         await this.notification.error("Impossible d'ajouter la photo");
       }
     } finally {
@@ -110,8 +115,16 @@ export class Tab1Page implements OnInit {
     await this.notification.success('Photo supprimée');
   }
 
-  private isCancellation(error: unknown): boolean {
-    const message = error instanceof Error ? error.message : String(error);
-    return message.toLowerCase().includes('cancel');
+  private classifyCameraError(error: unknown): 'cancel' | 'denied' | 'error' {
+    const message = (
+      error instanceof Error ? error.message : String(error)
+    ).toLowerCase();
+    if (message.includes('cancel')) {
+      return 'cancel';
+    }
+    if (message.includes('denied') || message.includes('permission')) {
+      return 'denied';
+    }
+    return 'error';
   }
 }

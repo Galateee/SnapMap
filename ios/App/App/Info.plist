@@ -51,5 +51,9 @@
 		<string>Pour afficher vos photos sur la carte.</string>
 		<key>NSCameraUsageDescription</key>
 		<string>Pour prendre des photos.</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>Pour enregistrer vos photos.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Pour accéder à vos photos.</string>
 	</dict>
 </plist>
