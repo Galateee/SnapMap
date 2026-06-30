@@ -17,6 +17,9 @@ import { environment } from './environments/environment';
 
 import './app/shared/components/camera-modal/camera-modal.element';
 import { defineCustomElements as defineStripeElements } from 'stripe-pwa-elements/loader';
+import { register as registerSwiper } from 'swiper/element/bundle';
+
+registerSwiper();
 
 // if (environment.production) {
 //   enableProdMode();

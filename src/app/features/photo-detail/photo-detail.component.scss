@@ -1,0 +1,34 @@
+.photo-swiper {
+  height: 100%;
+  width: 100%;
+}
+
+.slide {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.slide-image {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.slide-info {
+  padding: 16px;
+  text-align: center;
+}
+
+.slide-date,
+.slide-location {
+  margin: 4px 0;
+  font-size: 0.95rem;
+}
+
+.slide-location {
+  font-weight: 600;
+}
