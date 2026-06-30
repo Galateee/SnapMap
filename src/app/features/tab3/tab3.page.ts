@@ -9,6 +9,7 @@ import {
   IonCol,
   IonIcon,
   IonButton,
+  ToastController,
 } from '@ionic/angular/standalone';
 import { PhotoService } from '../../core/services/photo.service';
 import { PaymentService } from '../../core/services/payment.service';
@@ -34,6 +35,7 @@ import { lockClosed, lockOpen } from 'ionicons/icons';
 export class Tab3Page implements OnInit {
   photoService = inject(PhotoService);
   paymentService = inject(PaymentService);
+  private toastController = inject(ToastController);
 
   constructor() {
     addIcons({ lockClosed, lockOpen });
@@ -51,9 +53,23 @@ export class Tab3Page implements OnInit {
   }
 
   async buyPhotoWithGooglePay(filepath: string) {
+    const available = await this.paymentService.isGooglePayAvailable();
+    if (!available) {
+      await this.showToast('Google Pay indisponible sur cet appareil');
+      return;
+    }
     const success = await this.paymentService.buyPhotoWithGooglePay();
     if (success) {
       await this.photoService.markAsPurchased(filepath);
     }
+  }
+
+  private async showToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2500,
+      position: 'bottom',
+    });
+    await toast.present();
   }
 }

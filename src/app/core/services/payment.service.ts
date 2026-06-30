@@ -57,7 +57,21 @@ export class PaymentService {
     }
   }
 
+  async isGooglePayAvailable(): Promise<boolean> {
+    try {
+      await Stripe.isGooglePayAvailable();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async buyPhotoWithGooglePay(): Promise<boolean> {
+    const available = await this.isGooglePayAvailable();
+    if (!available) {
+      return false;
+    }
+
     const { paymentIntent } = await firstValueFrom(
       this.http
         .post<{
