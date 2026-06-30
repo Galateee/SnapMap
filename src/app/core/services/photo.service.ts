@@ -6,6 +6,7 @@ import { Preferences } from '@capacitor/preferences';
 export interface UserPhoto {
   filepath: string;
   webviewPath: string;
+  purchased: boolean;
 }
 
 @Injectable({
@@ -36,6 +37,7 @@ export class PhotoService {
     return {
       filepath: fileName,
       webviewPath: base64Data,
+      purchased: false,
     };
   }
 
@@ -69,5 +71,16 @@ export class PhotoService {
       }
     }
     this.photos = loaded;
+  }
+
+  public async markAsPurchased(filepath: string) {
+    const photo = this.photos.find((p) => p.filepath === filepath);
+    if (photo) {
+      photo.purchased = true;
+      await Preferences.set({
+        key: this.PHOTO_STORAGE,
+        value: JSON.stringify(this.photos),
+      });
+    }
   }
 }
