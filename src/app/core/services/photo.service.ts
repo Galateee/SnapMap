@@ -1,24 +1,32 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Camera, MediaResult } from '@capacitor/camera';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Preferences } from '@capacitor/preferences';
+import { GeolocationService } from './geolocation.service';
 
 export interface UserPhoto {
   filepath: string;
   webviewPath: string;
   purchased: boolean;
+  liked: boolean;
+  dateTaken: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class PhotoService {
+  private geolocationService = inject(GeolocationService);
+
   public photos: UserPhoto[] = [];
   private PHOTO_STORAGE = 'photos';
 
   public async takePhoto() {
     const result = await Camera.takePhoto({ quality: 100 });
-    const savedPhoto = await this.savePhoto(result);
+    const position = await this.geolocationService.getCurrentPosition();
+    const savedPhoto = await this.savePhoto(result, position);
     this.photos.unshift(savedPhoto);
     await Preferences.set({
       key: this.PHOTO_STORAGE,
@@ -26,9 +34,13 @@ export class PhotoService {
     });
   }
 
-  private async savePhoto(cameraPhoto: MediaResult): Promise<UserPhoto> {
+  private async savePhoto(
+    cameraPhoto: MediaResult,
+    position: { lat: number; lng: number } | null,
+  ): Promise<UserPhoto> {
     const base64Data = await this.readAsBase64(cameraPhoto);
-    const fileName = new Date().getTime() + '.jpeg';
+    const dateTaken = new Date().getTime();
+    const fileName = dateTaken + '.jpeg';
     await Filesystem.writeFile({
       path: fileName,
       data: base64Data,
@@ -38,6 +50,10 @@ export class PhotoService {
       filepath: fileName,
       webviewPath: base64Data,
       purchased: false,
+      liked: false,
+      dateTaken,
+      latitude: position?.lat,
+      longitude: position?.lng,
     };
   }
 
@@ -67,8 +83,7 @@ export class PhotoService {
         });
         photo.webviewPath = `data:image/jpeg;base64,${file.data}`;
         loaded.push(photo);
-      } catch {
-      }
+      } catch {}
     }
     this.photos = loaded;
   }
@@ -82,5 +97,30 @@ export class PhotoService {
         value: JSON.stringify(this.photos),
       });
     }
+  }
+
+  public async toggleLike(filepath: string) {
+    const photo = this.photos.find((p) => p.filepath === filepath);
+    if (photo) {
+      photo.liked = !photo.liked;
+      await Preferences.set({
+        key: this.PHOTO_STORAGE,
+        value: JSON.stringify(this.photos),
+      });
+    }
+  }
+
+  public async deletePhoto(filepath: string) {
+    this.photos = this.photos.filter((p) => p.filepath !== filepath);
+    await Preferences.set({
+      key: this.PHOTO_STORAGE,
+      value: JSON.stringify(this.photos),
+    });
+    try {
+      await Filesystem.deleteFile({
+        path: filepath,
+        directory: Directory.Data,
+      });
+    } catch {}
   }
 }

@@ -1,0 +1,14 @@
+.photo-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.photo-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.photo-thumb {
+  cursor: pointer;
+}

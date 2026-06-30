@@ -13,10 +13,38 @@
 
   <ion-grid>
     <ion-row>
-      @for (photo of photoService.photos; track photo.webviewPath) {
-        <ion-col size="6">
-          <ion-img [src]="photo.webviewPath"></ion-img>
-        </ion-col>
+      @for (photo of photoService.photos; track photo.filepath; let i = $index)
+      {
+      <ion-col size="6">
+        <div class="photo-item">
+          <ion-img
+            [src]="photo.webviewPath"
+            class="photo-thumb"
+            (click)="openPhoto(i)"
+          ></ion-img>
+          <div class="photo-actions">
+            <ion-button
+              fill="clear"
+              size="small"
+              (click)="toggleLike(photo.filepath)"
+            >
+              <ion-icon
+                slot="icon-only"
+                [name]="photo.liked ? 'heart' : 'heart-outline'"
+                [color]="photo.liked ? 'danger' : 'medium'"
+              ></ion-icon>
+            </ion-button>
+            <ion-button
+              fill="clear"
+              size="small"
+              color="danger"
+              (click)="confirmDelete(photo.filepath)"
+            >
+              <ion-icon slot="icon-only" name="trash"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </ion-col>
       }
     </ion-row>
   </ion-grid>
