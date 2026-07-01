@@ -17,6 +17,7 @@ const MIN_SPIDER_RADIUS = 74;
 const MAX_SPIDER_RADIUS = 132;
 const STAGGER_MS = 28;
 const BADGE_MAX = 99;
+const BBOX_PADDING = 0.3;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 @Injectable({ providedIn: 'root' })
@@ -99,12 +100,18 @@ export class MapService {
       return;
     }
     const zoom = Math.floor(this.map.getZoom());
+    const west = bounds.getWest();
+    const east = bounds.getEast();
+    const south = bounds.getSouth();
+    const north = bounds.getNorth();
+    const padX = (east - west) * BBOX_PADDING;
+    const padY = (north - south) * BBOX_PADDING;
     const clusters = this.index.getClusters(
       [
-        bounds.getWest(),
-        bounds.getSouth(),
-        bounds.getEast(),
-        bounds.getNorth(),
+        west - padX,
+        Math.max(-90, south - padY),
+        east + padX,
+        Math.min(90, north + padY),
       ],
       zoom,
     );
@@ -325,7 +332,15 @@ export class MapService {
   }
 
   private addUserMarker(lng: number, lat: number): void {
-    new mapboxgl.Marker({ color: '#810adc' })
+    const el = document.createElement('div');
+    el.className = 'snap-user';
+    el.setAttribute('aria-label', 'Votre position');
+    const halo = document.createElement('span');
+    halo.className = 'snap-user__halo';
+    const dot = document.createElement('span');
+    dot.className = 'snap-user__dot';
+    el.append(halo, dot);
+    new mapboxgl.Marker({ element: el, anchor: 'center' })
       .setLngLat([lng, lat])
       .addTo(this.map!);
   }

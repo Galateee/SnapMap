@@ -37,8 +37,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 4px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+  padding: 14px 4px 2px;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.62),
+    rgba(0, 0, 0, 0.18) 55%,
+    transparent
+  );
+}
+
+.photo-actions ion-button {
+  pointer-events: auto;
 }
 
 .photo-actions ion-icon {

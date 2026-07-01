@@ -19,7 +19,14 @@
     @for (photo of photos; track photo.filepath) {
       <swiper-slide>
         <div class="slide">
-          <img [src]="photo.webviewPath" class="slide-image" />
+          <div class="slide-media">
+            <img
+              [src]="photo.webviewPath"
+              class="slide-bg"
+              aria-hidden="true"
+            />
+            <img [src]="photo.webviewPath" class="slide-image" />
+          </div>
           <div class="slide-info">
             <p class="slide-date">
               {{ getDate(photo) | date: "dd/MM/yyyy HH:mm" }}

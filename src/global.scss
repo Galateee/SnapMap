@@ -44,6 +44,55 @@ stripe-payment-request-button {
   z-index: 100000;
 }
 
+ion-toast {
+  --border-radius: 12px;
+  --box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+}
+
+ion-toast::part(container) {
+  margin: 10px;
+}
+
+.snap-user {
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+
+.snap-user__dot {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #810adc;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
+}
+
+.snap-user__halo {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(129, 10, 220, 0.35);
+  animation: snap-user-pulse 2.2s ease-out infinite;
+}
+
+@keyframes snap-user-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
 .snap-marker {
   position: relative;
   width: 54px;
@@ -142,9 +191,9 @@ stripe-payment-request-button {
 
 .snap-spider__leg {
   stroke: #810adc;
-  stroke-width: 2.5;
+  stroke-width: 3.5;
   stroke-linecap: round;
-  opacity: 0.5;
+  opacity: 0.75;
   transition: stroke-dashoffset 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
